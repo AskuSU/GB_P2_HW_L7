@@ -1,8 +1,9 @@
-﻿#include<iostream>
+﻿#include<iosfwd>
 #include<windows.h>
-#include<vector>
-#include<set>
+#include<memory>
+#include<ctime>
 #include"MyLib.h"
+#include"Task1.h"
 //#include"Task2.h"
 #include"Task3-4-5.h"
 
@@ -11,8 +12,26 @@ using namespace myLib;
 
 void Task1()
 {
-	cout << "Ввод числа int с защитой от \"Дурака\":" << endl;
+	cout << "Работа с классом Date:" << endl << endl;
+	time_t now = time(0);
+	tm currTime;
+	gmtime_s(&currTime, &now);
 	
+	auto today = make_unique<Date>(currTime.tm_mday, currTime.tm_mon + 1, currTime.tm_year + 1900);
+	unique_ptr<Date> date;
+	
+	cout << "Сегодняшняя дата: " << endl;
+	cout << "День: " << today.get()->getDay() << endl;
+	cout << "Месяц: " << today.get()->getMonth() << endl;
+	cout << "Год: " << today.get()->getYear() << endl << endl;
+	cout << *today << endl;
+
+	cout << "объект today: " << (static_cast<bool>(today) ? "NOT null\n" : "null\n");
+	cout << "объект date: " << (static_cast<bool>(date) ? "NOT null\n" : "null\n");
+	cout << "Переместим ресурс today -> date" << endl;
+	date = move(today);
+	cout << "объект today: " << (static_cast<bool>(today) ? "NOT null\n" : "null\n");
+	cout << "объект date: " << (static_cast<bool>(date) ? "NOT null\n" : "null\n");
 }
 
 void Task2()
