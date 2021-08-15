@@ -4,7 +4,7 @@
 #include<ctime>
 #include"MyLib.h"
 #include"Task1.h"
-//#include"Task2.h"
+#include"Task2.h"
 #include"Task3-4-5.h"
 
 using namespace std;
@@ -36,8 +36,17 @@ void Task1()
 
 void Task2()
 {
-	cout << "Работа с собственным манипулятором endll:" << endl;
-	
+	cout << "Поиск максимальной даты:" << endl << endl;
+	auto date1 = make_shared<Date>(12,5,2021);
+	auto date2 = make_shared<Date>(13,5,2021);
+	cout << "date1: " << *date1 << endl;
+	cout << "date2: " << *date2 << endl;
+	auto dateMax = maxDate(date1, date2);
+	cout << "dateMax: " << *dateMax << endl;
+	cout << "Проверка на существоание исходных объектов:" << endl;
+	cout << "date1: " << *date1 << endl;
+	cout << "date2: " << *date2 << endl;
+
 }
 
 void Task3()
