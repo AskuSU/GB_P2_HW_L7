@@ -42,21 +42,142 @@ uint16_t Card::GetValue() const
 
 Deck::Deck()
 {
-	for (const auto& i : Suit())
+	cards.reserve(52);
+	Populate();
+}
+
+void Deck::Populate()
+{
+	Clear();
+	for (const auto& s : Suit())
 	{
-		for (const auto& j : Rank())
+		for (const auto& r : Rank())
 		{
-			cards[(int)i - 1][(int)j - 1].SetValue(j, i);
+			Add(new Card(r, s));
+		}
+	}
+}
+
+void Deck::Shuffle()
+{
+	std::random_shuffle(cards.begin(), cards.end());
+}
+
+void Deck::Deal(Hand& aHand)
+{
+	if (!cards.empty())
+	{
+		aHand.Add(cards.back());
+		cards.pop_back();
+	}
+	else
+	{
+		std::cout << "Нет карт. Невозможно дать карту.";
+	}
+}
+
+void Deck::AdditionalCards(GenericPlayer& aGenerlcPlayer)
+{
+	std::cout << std::endl;
+	while (!aGenerlcPlayer.IsBoosted() && aGenerlcPlayer.IsHitting())
+	{
+		Deal(aGenerlcPlayer);
+		std::cout << aGenerlcPlayer << std::endl;
+
+		if (aGenerlcPlayer.IsBoosted())
+		{
+			aGenerlcPlayer.Bust();
 		}
 	}
 }
 
 Game::Game(const std::vector<std::string>& names)
 {
+	for (auto& name : names)
+	{
+		players.push_back(Player(name));
+	}
+
+	std::srand(static_cast<uint32_t>(time(0)));
+	deck.Populate();
+	deck.Shuffle();
 }
 
 void Game::Play()
 {
+	// раздает каждому по две стартовые карты
+	for (size_t i = 0; i < 2; i++)
+	{
+		for (auto& player : players)
+		{
+			deck.Deal(player);
+		}
+		deck.Deal(house);
+	}
+
+	// прячет первую карту дилера
+	house.FlipFirstCard();
+
+	// открывает руки всех игроков
+	for (auto& player : players)
+	{
+		std::cout << player << std::endl;
+	}
+	std::cout << house << std::endl;
+
+	// раздает игрокам дополнительные карты
+	for (auto& player : players)
+	{
+		deck.AdditionalCards(player);
+	}
+
+	// показывает первую карту дилера
+	house.FlipFirstCard();
+	std::cout << std::endl << house;
+
+	// раздает дилеру дополнительные карты
+	deck.AdditionalCards(house);
+
+	if (house.IsBoosted())
+	{
+		// все, кто остался в игре, побеждают
+		for (auto& player : players)
+		{
+			if (!player.IsBoosted())
+			{
+				player.Win();
+			}
+		}
+	}
+	else
+	{
+		// сравнивает суммы очков всех оставшихся игроков с суммой очков дилера
+		for (auto& player : players)
+		{
+			if (!player.IsBoosted())
+			{
+				if (player.GetTotal() > house.GetTotal())
+				{
+					player.Win();
+				}
+				else if (player.GetTotal() < house.GetTotal())
+				{
+					player.Lose();
+				}
+				else
+				{
+					player.Push();
+				}
+			}
+		}
+	}
+
+	// очищает руки всех игроков
+	for (auto& player : players)
+	{
+		player.Clear();
+	}
+	house.Clear();
 }
 
 Hand::Hand()
@@ -152,12 +273,12 @@ void House::FlipFirstCard()
 
 std::ostream& operator<<(std::ostream& os, const Card& aCard)
 {
-	const std::string RANKS[] = { "0", "A", "2", "3", "4", "5", "6", "7", "8",
-							 "9","10", "J", "Q", "K" };
-	const std::string SUITS[] = { "c", "d", "h", "s" };
+	const std::string RANKS[] = { "A", "2", "3", "4", "5", "6", "7", "8", "9","10", "J", "Q", "K" };
+	// { "♣️", "♦️", "♥️", "♠️" };
+	const char SUITS[] = { 5, 4, 3, 6 };
 	if (aCard.isFaceUp)
 	{
-		os << RANKS[static_cast<uint16_t>(aCard.rank)] << SUITS[static_cast<uint16_t>(aCard.suit)];
+		os << RANKS[static_cast<uint16_t>(aCard.rank) - 1] << SUITS[static_cast<uint16_t>(aCard.suit) - 1];
 	}
 	else
 	{
@@ -169,23 +290,17 @@ std::ostream& operator<<(std::ostream& os, const Card& aCard)
 std::ostream& operator<<(std::ostream& os, const GenericPlayer& aGenericPlayer)
 {
 	os << aGenericPlayer.name << ":\t";
-	//std::vector<Card*>::const_iterator pCard;
 	if (!aGenericPlayer.cards.empty())
 	{
-		for (const auto& pCard : aGenericPlayer.cards)
-		{
-			os << pCard << "\t";
-		}
-		/*for (pCard = aGenericPlayer.cards.begin();
-			pCard != aGenericPlayer.cards.end();
-			++pCard)
-		{
-			os << *(*pCard) << "\t";
-		}*/
 		if (aGenericPlayer.GetTotal() != 0)
 		{
-			std::cout << "(" << aGenericPlayer.GetTotal() << ")";
+			std::cout << "(" << aGenericPlayer.GetTotal() << ")\t";
 		}
+		for (const auto& pCard : aGenericPlayer.cards)
+		{
+			os << *pCard << "\t";
+		}
+		
 	}
 	else
 	{

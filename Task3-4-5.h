@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include<ostream>
+#include<algorithm>
 //#include<stdint.h>
 
 class GenericPlayer;
@@ -58,9 +59,12 @@ public:
 	Hand();
 	virtual ~Hand();
 	
-	void Add(Card* pCard);		//Добавляет карту в руку. Добавляет указатель на объект типа Сard в вектор cards
-	void Clear();				//Очищает руку от карт. Удаляет все указатели из вектора cards, устраняя все связанные с ними объекты в куче
-	uint16_t GetTotal() const;	//Возвращает сумму очков карт руки, присваивая тузу значение 1 или 11 в зависимости от ситуации
+	//Добавляет карту в руку. Добавляет указатель на объект типа Сard в вектор cards
+	void Add(Card* pCard);
+	//Очищает руку от карт. Удаляет все указатели из вектора cards, устраняя все связанные с ними объекты в куче
+	void Clear();
+	//Возвращает сумму очков карт руки, присваивая тузу значение 1 или 11 в зависимости от ситуации
+	uint16_t GetTotal() const;
 
 protected:
 	std::vector<Card*> cards;
@@ -70,18 +74,17 @@ class Deck : public Hand
 {
 public:
 	Deck();
+	virtual ~Deck() = default;
 
-	void Populate();		//Создает стандартную колоду из 52 карт
-	void Shuffle();			//Тасует карты
-	void Deal(Hand& aHand); //Раздает в руку одну карту
-	void AddltionalCards(GenericPlayer& aGenerlcPlayer); //Раздает игроку дополнительные карты до тех пор, пока он может и хочет их получать
-	
-	Card GetCard(uint16_t number);
-	bool CheckIsStayedCard(uint16_t number);
+	//Создает стандартную колоду из 52 карт
+	void Populate();
+	//Тасует карты
+	void Shuffle();	
+	//Раздает в руку одну карту
+	void Deal(Hand& aHand); 
+	//Раздает игроку дополнительные карты до тех пор, пока он может и хочет их получать
+	void AdditionalCards(GenericPlayer& aGenerlcPlayer); 
 
-private:
-	uint16_t numberOfCards = (int)Suit::last * (int)Rank::last;
-	Card cards[(int)Suit::last][(int)Rank::last]{};
 };
 
 //-------------Колода------------->>
@@ -165,16 +168,6 @@ private:
 
 };
 
-
-class GameEntity
-{
-public:
-
-private:
-	std::string name;
-	//int64_t 
-};
-
 //-------------Участники игры------------->>
 
 //<<-----------Игра---------------
@@ -183,6 +176,8 @@ class Game
 {
 public:
 	Game(const std::vector<std::string>& names);
+	~Game() = default;
+
 	void Play();
 
 private:
