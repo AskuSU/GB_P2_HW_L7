@@ -32,6 +32,7 @@ void Task1()
 	date = move(today);
 	cout << "объект today: " << (static_cast<bool>(today) ? "NOT null\n" : "null\n");
 	cout << "объект date: " << (static_cast<bool>(date) ? "NOT null\n" : "null\n");
+
 }
 
 void Task2()
@@ -45,7 +46,15 @@ void Task2()
 	cout << "dateMax: " << *dateMax << endl;
 	cout << "Проверка на существоание исходных объектов:" << endl;
 	cout << "date1: " << *date1 << endl;
-	cout << "date2: " << *date2 << endl;
+	cout << "date2: " << *date2 << endl << endl;
+
+	cout << "Меняем местами date1 и date2: " << endl;
+	swapDate(date1, date2);
+	cout << "date1: " << *date1 << endl;
+	cout << "date2: " << *date2 << endl << endl;
+	
+	cout << "Проверяем что dateMax остался верный: " << endl;
+	cout << "dateMax: " << *dateMax << endl;
 
 }
 

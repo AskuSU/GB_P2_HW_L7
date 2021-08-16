@@ -9,3 +9,10 @@ std::shared_ptr<Date> maxDate(const std::shared_ptr<Date>& date1, const std::sha
 	else if(date1.get()->getDay() > date2.get()->getDay()) return std::shared_ptr<Date>(date1);
 	else return std::shared_ptr<Date>(date2);
 }
+
+void swapDate(std::shared_ptr<Date>& date1, std::shared_ptr<Date>& date2)
+{
+	auto tmp = move(date1);
+	date1 = move(date2);
+	date2 = move(tmp);
+}
