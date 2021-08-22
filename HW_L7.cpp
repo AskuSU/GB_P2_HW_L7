@@ -68,6 +68,7 @@ void Task3()
 		numPlayers = getUserInput<uint16_t>();
 	}
 	vector<string> names;
+	names.reserve(numPlayers);
 	string name;
 	for (int i = 0; i < numPlayers; ++i)
 	{
